@@ -5,6 +5,8 @@
 //  Created by Yuen, Teresa on 12/05/2025.
 //
 
+import Foundation
+
 public protocol AddTaskDelegate {
-    func addTask(title: String)
+    func addTask(title: String, dueDate: Date?)
 }

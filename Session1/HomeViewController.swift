@@ -15,7 +15,7 @@ class HomeViewController: UIViewController {
         view.backgroundColor = .systemBackground
         
         let fetchRequest: NSFetchRequest<ToDo> = ToDo.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        let sortDescriptor = NSSortDescriptor(key: "dueDate", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
         fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
@@ -58,10 +58,13 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        var cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
         let task = fetchResultController.object(at: indexPath)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
         
-        var attributedTitle = NSMutableAttributedString(string: task.title ?? "")
+        let attributedTitle = NSMutableAttributedString(string: task.title ?? "")
 
         if task.isCompleted {
             let range = NSRange(location: 0, length: attributedTitle.length)
@@ -70,7 +73,12 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         }
 
         cell.textLabel?.attributedText = attributedTitle
-        cell.detailTextLabel?.text = task.description
+        cell.detailTextLabel?.numberOfLines = 0
+//        cell.detailTextLabel?.text = "yooo\nsfdgs\nsdfgsdg"
+        cell.accessoryView = UIImageView(image: UIImage(systemName: "chevron.right"))
+        if let dueDate = task.dueDate {
+            cell.detailTextLabel?.text = dateFormatter.string(for: dueDate)
+        }
         return cell
     }
     
@@ -78,7 +86,6 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         if editingStyle == .delete {
             let toBeDeleted = fetchResultController.object(at: indexPath)
             CoreDataManager.shared.deleteToDo(item: toBeDeleted)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
     
@@ -120,9 +127,10 @@ extension HomeViewController: NSFetchedResultsControllerDelegate {
 }
 
 extension HomeViewController: AddTaskDelegate {
-    func addTask(title: String) {
+    func addTask(title: String, dueDate: Date?) {
         let newTask = ToDo(context: CoreDataManager.shared.viewContext)
         newTask.title = title
+        newTask.dueDate = dueDate
         CoreDataManager.shared.saveContext()
     }
 }
