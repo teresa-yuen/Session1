@@ -22,9 +22,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        let viewController = HomeViewController()
-        let navigationController = UINavigationController(rootViewController: viewController)
-        window?.rootViewController = navigationController
+//        let viewController = SwipingViewController()
+//        let navigationController = UINavigationController(rootViewController: viewController)
+        window?.rootViewController = SwipingViewController()
         window?.makeKeyAndVisible()
     }
 
